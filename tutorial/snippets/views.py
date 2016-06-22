@@ -3,16 +3,14 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from snippets.models import Snippet
-from snippets.serializers import SnippetSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from snippets.models import Snippet
-from snippets.serializers import SnippetSerializer
+from snippets.models import *
+from snippets.serializers import *
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -179,5 +177,26 @@ class ProfileList(APIView):
 
     def get(self, request):
         queryset = Snippet.objects.all()
-        serializer = SnippetSerializer(queryset)
-        return Response(serializer.data,{'profiles': queryset})
+        return Response({'profiles': queryset})
+
+class Load(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'signup.html'
+
+    def get(self, request):
+        return Response({})
+
+class Signup(APIView):
+
+    def get(self, request, format=None):
+        signsnip = Snippets_Signup.objects.all()
+        serializer = SignupSerializer(signsnip, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format = None):
+        serializer = SignupSerializer(data=request.data)
+        print serializer
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

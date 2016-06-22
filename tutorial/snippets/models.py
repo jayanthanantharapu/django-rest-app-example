@@ -18,3 +18,8 @@ class Snippet(models.Model):
 
     class Meta:
         ordering = ('created',)
+
+class Signup(models.Model):
+    name = models.CharField(max_length=100, blank=True, default='')
+    pwd = models.CharField(max_length=100, blank=True, default='')
+    objects = models.Manager()
